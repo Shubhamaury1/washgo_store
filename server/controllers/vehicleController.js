@@ -1,0 +1,73 @@
+import Vehicle from "../models/Vehicle.js";
+
+export const createVehicle = async (req, res) => {
+  try {
+    const vehicle = await Vehicle.create({
+      name: req.body.name,
+
+      image: req.file ? req.file.path : "",
+
+      description: req.body.description,
+      title: req.body.title,
+      
+    });
+
+    res.status(201).json(vehicle);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getVehicles = async (req, res) => {
+  try {
+    const vehicles = await Vehicle.find();
+
+    res.json(vehicles);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const updateVehicle = async (req, res) => {
+  try {
+    const updateData = {
+      name: req.body.name,
+      description: req.body.description,
+      title: req.body.title,
+    };
+
+    if (req.file) {
+      updateData.image = req.file.path;
+    }
+
+    const vehicle = await Vehicle.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
+
+    res.json(vehicle);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const toggleVehicleStatus = async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findById(req.params.id);
+
+    vehicle.isActive = !vehicle.isActive;
+
+    await vehicle.save();
+
+    res.json(vehicle);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};

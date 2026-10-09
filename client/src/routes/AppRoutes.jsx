@@ -1,0 +1,101 @@
+import { Routes, Route } from "react-router-dom";
+import Home from "../pages/Home/Home";
+import CustomerDashboard from "../pages/CustomerDashboard/CustomerDashboard";
+import Booking from "../pages/Booking/Booking";
+import About from "../pages/About/About";
+import Contact from "../pages/Contact/Contact";
+import Reviews from "../pages/Reviews/Reviews";
+import Services from "../pages/Services/Services";
+import Login from "../pages/Login/Login";
+import Register from "../pages/Register/Register";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
+import Address from "../pages/Address/Address";
+import BookingSuccess from "../pages/BookingSuccess/BookingSuccess";
+import ProtectedRoute from "./ProtectedRoute";
+import MyBookings from "../pages/MyBookings/MyBookings";
+import AdminLayout from "../pages/Admin/AdminLayout";
+import Dashboard from "../pages/Admin/Dashboard";
+import Vehicles from "../pages/Admin/Vehicles";
+import Packages from "../pages/Admin/Packages";
+import Bookings from "../pages/Admin/Bookings";
+import Users from "../pages/Admin/Users";
+import SingleBookingReview from "../pages/SingleBookingReview/SingleBookingReview";
+import Payment from "../pages/Payment/Payment";
+import ChatPage from "../pages/Chat/ChatPage";
+import AdminChatPage from "../pages/Admin/AdminChatPage";
+import Settings from "../pages/Settings/Settings";
+import Notifications from "../pages/Notifications/Notifications";
+import AdminOffers from "../pages/Admin/AdminOffers";
+
+const AppRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/services" element={<Services />} />
+      <Route path="/reviews" element={<Reviews />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/chat" element={<ChatPage />} />
+      {/* <Route path="/booking" element={<Booking />} /> */}
+      <Route
+        path="/booking"
+        element={
+          <ProtectedRoute>
+            <Booking />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/my-bookings" element={<MyBookings />} />
+      <Route path="/my-bookings/:id" element={<SingleBookingReview />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <CustomerDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route
+        path="/address"
+        element={
+          <ProtectedRoute>
+            <Address />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/payment"
+        element={
+          <ProtectedRoute>
+            <Payment />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="/booking-success" element={<BookingSuccess />} />
+      <Route element={<AdminLayout />}>
+        <Route path="/admin/dashboard" element={<Dashboard />} />
+
+        <Route path="/admin/vehicles" element={<Vehicles />} />
+
+        <Route path="/admin/packages" element={<Packages />} />
+
+        <Route path="/admin/bookings" element={<Bookings />} />
+
+        <Route path="/admin/users" element={<Users />} />
+
+        <Route path="/admin/chat" element={<AdminChatPage />} />
+
+        <Route path="/admin/offers" element={<AdminOffers />} />
+      </Route>
+    </Routes>
+  );
+};
+
+export default AppRoutes;

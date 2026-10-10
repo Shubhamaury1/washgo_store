@@ -10,10 +10,11 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firebase";
 import loginlogo from "../../assets/logos/logi.avif"
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const Login = () => {
-
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -32,6 +33,9 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (loading) return;
+    setLoading(true);
+
     try {
       const res = await authApi.login(formData);
 
@@ -49,6 +53,8 @@ const Login = () => {
       navigate("/dashboard");
     } catch (err) {
       toast.error(err.response?.data?.message || "Login Failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,6 +96,7 @@ const Login = () => {
       // console.log(res.data);
     } catch (err) {
       console.error(err);
+      toast.error(err.message || "Google Login Failed");
     }
   };
 
@@ -233,9 +240,21 @@ const Login = () => {
 
                 <button
                   type="submit"
-                  className="w-full rounded-xl sm:rounded-2xl py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-[#2E63F4] to-[#244ED6] shadow-xl hover:scale-[1.02] transition active:scale-95"
+                  disabled={loading}
+                  className={`w-full rounded-xl sm:rounded-2xl py-3 sm:py-4 text-base sm:text-lg font-semibold text-white flex items-center justify-center gap-2 cursor-pointer transition ${
+                    loading
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-gradient-to-r from-[#2E63F4] to-[#244ED6] shadow-xl hover:scale-[1.02] active:scale-95"
+                  }`}
                 >
-                  Login →
+                  {loading ? (
+                    <>
+                      <FaSpinner className="w-5 h-5 animate-spin" />
+                      <span>Logging in...</span>
+                    </>
+                  ) : (
+                    "Login →"
+                  )}
                 </button>
               </form>
 

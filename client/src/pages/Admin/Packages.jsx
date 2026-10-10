@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import vehicleApi from "../../api/vehicleApi";
 import packageApi from "../../api/packageApi";
 import { toast } from "react-toastify";
+import { FaSpinner } from "react-icons/fa";
 
 const Packages = () => {
   const [vehicles, setVehicles] = useState([]);
   const [packages, setPackages] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     vehicleId: "",
@@ -50,6 +52,9 @@ const Packages = () => {
       return;
     }
 
+    if (submitting) return;
+    setSubmitting(true);
+
     try {
       if (editingId) {
         const { data } = await packageApi.updatePackage(editingId, form);
@@ -66,6 +71,7 @@ const Packages = () => {
         );
 
         setEditingId(null);
+        toast.success("Package updated successfully");
       } else {
         const { data } = await packageApi.createPackage(form);
 
@@ -75,12 +81,16 @@ const Packages = () => {
         };
 
         setPackages((prev) => [newPackage, ...prev]);
+        toast.success("Package added successfully");
       }
 
      
       handleCancelForm();
     } catch (error) {
       console.log(error);
+      toast.error(error.response?.data?.message || "Failed to save package");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -239,9 +249,19 @@ const Packages = () => {
             <div className="flex gap-2">
               <button
                 onClick={handleSubmit}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl font-semibold text-sm"
+                disabled={submitting}
+                className={`flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer ${
+                  submitting ? "opacity-75 cursor-not-allowed" : ""
+                }`}
               >
-                {editingId ? "Update" : "Add Package"}
+                {submitting ? (
+                  <>
+                    <FaSpinner className="w-4 h-4 animate-spin" />
+                    <span>{editingId ? "Updating..." : "Adding..."}</span>
+                  </>
+                ) : (
+                  editingId ? "Update" : "Add Package"
+                )}
               </button>
 
               {editingId && (
@@ -396,9 +416,19 @@ const Packages = () => {
             <div className="flex gap-3 mt-5">
               <button
                 onClick={handleSubmit}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold"
+                disabled={submitting}
+                className={`flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 cursor-pointer ${
+                  submitting ? "opacity-75 cursor-not-allowed" : ""
+                }`}
               >
-                {editingId ? "Update Package" : "Add Package"}
+                {submitting ? (
+                  <>
+                    <FaSpinner className="w-5 h-5 animate-spin" />
+                    <span>{editingId ? "Updating..." : "Adding..."}</span>
+                  </>
+                ) : (
+                  editingId ? "Update Package" : "Add Package"
+                )}
               </button>
 
               {editingId && (

@@ -71,3 +71,17 @@ export const toggleVehicleStatus = async (req, res) => {
     });
   }
 };
+
+export const deleteVehicle = async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findByIdAndDelete(req.params.id);
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
+    res.json({ message: "Vehicle deleted successfully", id: req.params.id });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};

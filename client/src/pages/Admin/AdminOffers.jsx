@@ -3,6 +3,7 @@ import { FaUsers, FaGift, FaTicketAlt, FaPaperPlane } from "react-icons/fa";
 import { toast } from "react-toastify";
 import adminNotificationApi from "../../api/adminNotificationApi";
 import authApi from "../../api/authApi";
+import ConfirmModal from "../../components/ConfirmModal";
 
 function AdminOffers() {
   const admin = JSON.parse(localStorage.getItem("user"));
@@ -11,6 +12,8 @@ function AdminOffers() {
   const [users, setUsers] = useState([]);
   const [offers, setOffers] = useState([]);
   const [search, setSearch] = useState("");
+  const [couponToDelete, setCouponToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
  const [form, setForm] = useState({
    title: "",
@@ -455,18 +458,8 @@ function AdminOffers() {
                       <div className="w-px bg-gray-200"></div>
 
                       <button
-                        onClick={async () => {
-                          if (!window.confirm("Delete this coupon?")) return;
-
-                          try {
-                            await adminNotificationApi.deleteCoupon(item._id);
-                            toast.success("Deleted");
-                            loadOffers();
-                          } catch {
-                            toast.error("Delete failed");
-                          }
-                        }}
-                        className="flex-1 py-2 md:py-3 font-semibold text-red-600 hover:bg-red-50 transition"
+                        onClick={() => setCouponToDelete(item)}
+                        className="flex-1 py-2 md:py-3 font-semibold text-red-600 hover:bg-red-50 transition cursor-pointer"
                       >
                         Delete
                       </button>
@@ -479,6 +472,35 @@ function AdminOffers() {
 
         {/* Coupon List */}
       </div>
+
+      <ConfirmModal
+        isOpen={Boolean(couponToDelete)}
+        onClose={() => setCouponToDelete(null)}
+        onConfirm={async () => {
+          if (!couponToDelete) return;
+          setIsDeleting(true);
+          try {
+            await adminNotificationApi.deleteCoupon(couponToDelete._id);
+            toast.success("Coupon Deleted");
+            setCouponToDelete(null);
+            loadOffers();
+          } catch {
+            toast.error("Delete failed");
+          } finally {
+            setIsDeleting(false);
+          }
+        }}
+        title="Delete Coupon"
+        message={
+          couponToDelete
+            ? `Are you sure you want to delete coupon "${couponToDelete.couponCode}"? This action cannot be undone.`
+            : "Are you sure you want to delete this coupon?"
+        }
+        confirmText="Delete"
+        cancelText="Cancel"
+        isLoading={isDeleting}
+        type="danger"
+      />
     </div>
   );
 }

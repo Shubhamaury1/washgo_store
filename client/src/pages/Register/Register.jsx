@@ -8,6 +8,7 @@ import { loginSuccess } from "../../redux/authSlice";
 import { useNavigate } from "react-router-dom";
 import reglogo from "../../assets/logos/register.jpg";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import { FaSpinner } from "react-icons/fa";
 import { auth } from "../../firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { toast } from "react-toastify";
@@ -17,6 +18,7 @@ const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     mobile: "",
@@ -48,6 +50,9 @@ const Register = () => {
       return;
     }
 
+    if (submitting) return;
+    setSubmitting(true);
+
     try {
       const payload = {
         fullName: formData.fullName,
@@ -63,6 +68,8 @@ const Register = () => {
       navigate("/login");
     } catch (error) {
       toast.error(error.response?.data?.message || "Registration Failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -100,6 +107,7 @@ const Register = () => {
       // console.log(res.data);
     } catch (err) {
       console.error(err);
+      toast.error(err.message || "Google Sign-In Failed");
     }
   };
   return (
@@ -305,9 +313,21 @@ const Register = () => {
               {/* Button */}
               <button
                 type="submit"
-                className="w-full rounded-xl sm:rounded-2xl py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-[#2E63F4] to-[#244ED6] shadow-xl hover:scale-[1.02] transition active:scale-95"
+                disabled={submitting}
+                className={`w-full rounded-xl sm:rounded-2xl py-3 sm:py-4 text-base sm:text-lg font-semibold text-white flex items-center justify-center gap-2 cursor-pointer transition ${
+                  submitting
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#2E63F4] to-[#244ED6] shadow-xl hover:scale-[1.02] active:scale-95"
+                }`}
               >
-                Create Account
+                {submitting ? (
+                  <>
+                    <FaSpinner className="w-5 h-5 animate-spin" />
+                    <span>Creating Account...</span>
+                  </>
+                ) : (
+                  "Create Account"
+                )}
               </button>
             </form>
 

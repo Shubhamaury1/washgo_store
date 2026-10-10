@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import authApi from "../../api/authApi";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const ForgotPassword = () => {
@@ -125,14 +126,20 @@ const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={sendingOtp}
-                className={`w-full rounded-xl sm:rounded-2xl py-3 sm:py-4 text-base sm:text-lg font-semibold text-white transition
-    ${
-      sendingOtp
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-gradient-to-r from-[#2E63F4] to-[#244ED6] hover:scale-[1.02] shadow-xl active:scale-95"
-    }`}
+                className={`w-full rounded-xl sm:rounded-2xl py-3 sm:py-4 text-base sm:text-lg font-semibold text-white flex items-center justify-center gap-2 transition cursor-pointer ${
+                  sendingOtp
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#2E63F4] to-[#244ED6] hover:scale-[1.02] shadow-xl active:scale-95"
+                }`}
               >
-                {sendingOtp ? "Sending OTP..." : "Send OTP →"}
+                {sendingOtp ? (
+                  <>
+                    <FaSpinner className="w-5 h-5 animate-spin" />
+                    <span>Sending OTP...</span>
+                  </>
+                ) : (
+                  "Send OTP →"
+                )}
               </button>
             </form>
           )}
@@ -162,14 +169,20 @@ const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={verifyingOtp}
-                className={`w-full rounded-xl sm:rounded-2xl py-3 sm:py-4 text-base sm:text-lg font-semibold text-white transition
-    ${
-      verifyingOtp
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-gradient-to-r from-[#2E63F4] to-[#244ED6] hover:scale-[1.02] shadow-xl active:scale-95"
-    }`}
+                className={`w-full rounded-xl sm:rounded-2xl py-3 sm:py-4 text-base sm:text-lg font-semibold text-white flex items-center justify-center gap-2 transition cursor-pointer ${
+                  verifyingOtp
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#2E63F4] to-[#244ED6] hover:scale-[1.02] shadow-xl active:scale-95"
+                }`}
               >
-                {verifyingOtp ? "Verifying..." : "Verify OTP"}
+                {verifyingOtp ? (
+                  <>
+                    <FaSpinner className="w-5 h-5 animate-spin" />
+                    <span>Verifying...</span>
+                  </>
+                ) : (
+                  "Verify OTP"
+                )}
               </button>
             </form>
           )}
@@ -234,14 +247,20 @@ const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={resettingPassword}
-                className={`w-full rounded-xl sm:rounded-2xl py-3 sm:py-4 text-base sm:text-lg font-semibold text-white transition
-    ${
-      resettingPassword
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-gradient-to-r from-[#2E63F4] to-[#244ED6] hover:scale-[1.02] shadow-xl active:scale-95"
-    }`}
+                className={`w-full rounded-xl sm:rounded-2xl py-3 sm:py-4 text-base sm:text-lg font-semibold text-white flex items-center justify-center gap-2 transition cursor-pointer ${
+                  resettingPassword
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#2E63F4] to-[#244ED6] hover:scale-[1.02] shadow-xl active:scale-95"
+                }`}
               >
-                {resettingPassword ? "Updating Password..." : "Continue"}
+                {resettingPassword ? (
+                  <>
+                    <FaSpinner className="w-5 h-5 animate-spin" />
+                    <span>Updating Password...</span>
+                  </>
+                ) : (
+                  "Continue"
+                )}
               </button>
             </form>
           )}

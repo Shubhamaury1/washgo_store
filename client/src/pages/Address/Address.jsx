@@ -3,17 +3,16 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import addressApi from "../../api/addressApi";
 import { toast } from "react-toastify";
+import { FaSpinner } from "react-icons/fa";
 
 const Address = () => {
   const navigate = useNavigate();
 
   const [addresses, setAddresses] = useState([]);
-
   const [selectedAddress, setSelectedAddress] = useState(null);
-
   const [showForm, setShowForm] = useState(false);
-
   const [editId, setEditId] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -105,6 +104,9 @@ const Address = () => {
   const handleSaveAddress = async (e) => {
     e.preventDefault();
 
+    if (saving) return;
+    setSaving(true);
+
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const payload = {
@@ -125,13 +127,13 @@ const Address = () => {
         setAddresses((prev) =>
           prev.map((item) => (item._id === editId ? response.data : item)),
         );
+        toast.success("Address updated successfully");
       } else {
         response = await addressApi.createAddress(payload);
         await loadAddresses();
 
         setSelectedAddress(response.data);
-
-        // setAddresses((prev) => [...prev, response.data]);
+        toast.success("Address saved successfully");
       }
 
       setShowForm(false);
@@ -149,6 +151,8 @@ const Address = () => {
     } catch (error) {
       console.log(error);
       toast.error("Save Failed");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -356,9 +360,19 @@ const Address = () => {
 
               <button
                 type="submit"
-                className="col-span-1 md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white py-3 md:py-5 rounded-xl md:rounded-2xl text-sm md:text-lg font-semibold"
+                disabled={saving}
+                className={`col-span-1 md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white py-3 md:py-5 rounded-xl md:rounded-2xl text-sm md:text-lg font-semibold flex items-center justify-center gap-2 cursor-pointer ${
+                  saving ? "opacity-75 cursor-not-allowed" : ""
+                }`}
               >
-                {editId ? "Update Address" : "Save Address"}
+                {saving ? (
+                  <>
+                    <FaSpinner className="w-5 h-5 animate-spin" />
+                    <span>{editId ? "Updating Address..." : "Saving Address..."}</span>
+                  </>
+                ) : (
+                  editId ? "Update Address" : "Save Address"
+                )}
               </button>
             </form>
           )}

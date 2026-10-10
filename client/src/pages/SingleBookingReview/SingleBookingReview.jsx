@@ -8,6 +8,7 @@ import MainLayout from "../../layouts/MainLayout";
 import Sidebar from "../../components/dashboard/Sidebar";
 import { toast } from "react-toastify";
 import generateInvoicePDF from "../../components/PDFInvoice";
+import ConfirmModal from "../../components/ConfirmModal";
 
 import {
   FaCar,
@@ -39,6 +40,8 @@ function SingleBookingReview() {
   const [review, setReview] = useState(null);
   const [loadingReview, setLoadingReview] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadBooking();
@@ -66,18 +69,21 @@ function SingleBookingReview() {
     }
   };
 
-  const handleDeleteReview = async () => {
-    if (!window.confirm("Delete this review?")) return;
+  const handleConfirmDeleteReview = async () => {
+    if (!review) return;
+    setIsDeleting(true);
 
     try {
       await reviewApi.deleteReview(review._id);
 
       setReview(null);
-
+      setShowDeleteModal(false);
       toast.success("Review Deleted Successfully.");
     } catch (err) {
       console.log(err);
       toast.error(err.response?.data?.message || "Failed to delete review.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -355,7 +361,7 @@ function SingleBookingReview() {
                     <ReviewCard
                       review={review}
                       onEdit={() => setEditing(true)}
-                      onDelete={handleDeleteReview}
+                      onDelete={() => setShowDeleteModal(true)}
                     />
                   ) : (
                     <ReviewForm
@@ -374,6 +380,18 @@ function SingleBookingReview() {
           </main>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDeleteReview}
+        title="Delete Review"
+        message="Are you sure you want to delete your review? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isLoading={isDeleting}
+        type="danger"
+      />
     </MainLayout>
   );
 }

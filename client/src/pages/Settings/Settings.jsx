@@ -13,6 +13,7 @@ import {
   FaBell,
   FaMoon,
   FaSave,
+  FaSpinner,
 } from "react-icons/fa";
 
 const Settings = () => {
@@ -21,6 +22,7 @@ const Settings = () => {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [profileFile, setProfileFile] = useState(null);
+  const [saving, setSaving] = useState(false);
   const IMG_URL = import.meta.env.VITE_API_IMG_URL;
 
   const [profileImage, setProfileImage] = useState(
@@ -50,6 +52,9 @@ const Settings = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (saving) return;
+    setSaving(true);
 
     try {
       // Update Profile
@@ -106,6 +111,8 @@ const Settings = () => {
       toast.success("Profile Updated Successfully");
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -404,10 +411,22 @@ const Settings = () => {
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="flex items-center gap-2 md:gap-3 bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-8 py-2 md:py-4 rounded-lg md:rounded-2xl font-semibold transition text-sm md:text-base"
+                  disabled={saving}
+                  className={`flex items-center justify-center gap-2 md:gap-3 bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-8 py-2 md:py-4 rounded-lg md:rounded-2xl font-semibold transition text-sm md:text-base cursor-pointer ${
+                    saving ? "opacity-75 cursor-not-allowed" : ""
+                  }`}
                 >
-                  <FaSave />
-                  Save Changes
+                  {saving ? (
+                    <>
+                      <FaSpinner className="w-5 h-5 animate-spin" />
+                      <span>Saving Changes...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FaSave />
+                      <span>Save Changes</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

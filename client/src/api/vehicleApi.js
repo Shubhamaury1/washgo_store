@@ -18,6 +18,7 @@ const vehicleApi = {
     }),
 
   toggleStatus: (id) => API.patch(`/vehicles/${id}/status`),
+  deleteVehicle: (id) => API.delete(`/vehicles/${id}`),
 };
 
 export default vehicleApi;

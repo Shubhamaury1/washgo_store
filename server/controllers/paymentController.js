@@ -20,7 +20,6 @@ export const createOrder = async (req, res) => {
       order,
       key: process.env.RAZORPAY_KEY_ID,
     });
-    console.log("RAZORPAY_KEY_ID:", process.env.RAZORPAY_KEY_ID);
   } catch (err) {
     res.status(500).json({
       success: false,

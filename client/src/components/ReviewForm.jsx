@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaCloudUploadAlt, FaTrash } from "react-icons/fa";
+import { FaCloudUploadAlt, FaTrash, FaSpinner } from "react-icons/fa";
 import RatingStars from "./RatingStars";
 import reviewApi from "../api/reviewApi";
 import { toast } from "react-toastify";
@@ -216,13 +216,20 @@ function ReviewForm({ bookingId, onReviewAdded, reviewData, isEditing }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-2 md:py-3 rounded-lg md:rounded-xl font-semibold transition text-sm md:text-base"
+          className={`w-full bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-2 md:py-3 rounded-lg md:rounded-xl font-semibold transition text-sm md:text-base flex items-center justify-center gap-2 cursor-pointer ${
+            loading ? "opacity-75 cursor-not-allowed" : ""
+          }`}
         >
-          {loading
-            ? "Saving..."
-            : isEditing
-              ? "Update Review"
-              : "Submit Review"}
+          {loading ? (
+            <>
+              <FaSpinner className="w-5 h-5 animate-spin" />
+              <span>Saving...</span>
+            </>
+          ) : isEditing ? (
+            "Update Review"
+          ) : (
+            "Submit Review"
+          )}
         </button>
       </form>
     </div>

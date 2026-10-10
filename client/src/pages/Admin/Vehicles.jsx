@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import vehicleApi from "../../api/vehicleApi";
+import ConfirmModal from "../../components/ConfirmModal";
+import { toast } from "react-toastify";
+import { FaSpinner } from "react-icons/fa";
 
 const Vehicles = () => {
   const BaseURL = import.meta.env.VITE_API_IMG_URL;
@@ -8,6 +11,9 @@ const Vehicles = () => {
 
   const [preview, setPreview] = useState("");
   const [image, setImage] = useState(null);
+  const [vehicleToDelete, setVehicleToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -31,6 +37,9 @@ const Vehicles = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (submitting) return;
+    setSubmitting(true);
+
     const formData = new FormData();
 
     formData.append("name", form.name);
@@ -50,10 +59,12 @@ const Vehicles = () => {
         );
 
         setEditingId(null);
+        toast.success("Vehicle updated successfully");
       } else {
         const { data } = await vehicleApi.createVehicle(formData);
 
         setVehicles((prev) => [data, ...prev]);
+        toast.success("Vehicle added successfully");
       }
 
       setForm({
@@ -66,6 +77,9 @@ const Vehicles = () => {
       setPreview("");
     } catch (error) {
       console.log(error);
+      toast.error(error.response?.data?.message || "Failed to save vehicle");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -86,19 +100,25 @@ const Vehicles = () => {
     });
   };
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this vehicle?",
-    );
+  const handleDeleteClick = (vehicle) => {
+    setVehicleToDelete(vehicle);
+  };
 
-    if (!confirmDelete) return;
+  const handleConfirmDelete = async () => {
+    if (!vehicleToDelete) return;
+    setIsDeleting(true);
 
     try {
-      await vehicleApi.deleteVehicle(id);
+      await vehicleApi.deleteVehicle(vehicleToDelete._id);
 
-      setVehicles((prev) => prev.filter((vehicle) => vehicle._id !== id));
+      setVehicles((prev) => prev.filter((vehicle) => vehicle._id !== vehicleToDelete._id));
+      toast.success(`Vehicle "${vehicleToDelete.name}" deleted successfully.`);
+      setVehicleToDelete(null);
     } catch (error) {
       console.log(error);
+      toast.error(error.response?.data?.message || "Failed to delete vehicle.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -254,13 +274,23 @@ const Vehicles = () => {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <button
               type="submit"
-              className={`px-6 sm:px-8 h-12 sm:h-14 rounded-2xl text-white font-semibold transition text-sm sm:text-base ${
+              disabled={submitting}
+              className={`px-6 sm:px-8 h-12 sm:h-14 rounded-2xl text-white font-semibold transition text-sm sm:text-base flex items-center justify-center gap-2 cursor-pointer ${
+                submitting ? "opacity-75 cursor-not-allowed" : ""
+              } ${
                 editingId
                   ? "bg-green-600 hover:bg-green-700"
                   : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
-              {editingId ? "Update Vehicle" : "Add Vehicle"}
+              {submitting ? (
+                <>
+                  <FaSpinner className="w-5 h-5 animate-spin" />
+                  <span>{editingId ? "Updating..." : "Adding..."}</span>
+                </>
+              ) : (
+                editingId ? "Update Vehicle" : "Add Vehicle"
+              )}
             </button>
 
             {editingId && (
@@ -324,8 +354,8 @@ const Vehicles = () => {
                   </button>
 
                   <button
-                    onClick={() => handleDelete(vehicle._id)}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition text-sm sm:text-base"
+                    onClick={() => handleDeleteClick(vehicle)}
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition text-sm sm:text-base cursor-pointer"
                   >
                     Delete
                   </button>
@@ -348,6 +378,22 @@ const Vehicles = () => {
         </div>
       )}
     </div>
+
+    <ConfirmModal
+      isOpen={Boolean(vehicleToDelete)}
+      onClose={() => setVehicleToDelete(null)}
+      onConfirm={handleConfirmDelete}
+      title="Delete Vehicle"
+      message={
+        vehicleToDelete
+          ? `Are you sure you want to delete "${vehicleToDelete.name}"? This action cannot be undone.`
+          : "Are you sure you want to delete this vehicle?"
+      }
+      confirmText="Delete"
+      cancelText="Cancel"
+      isLoading={isDeleting}
+      type="danger"
+    />
     </>
    
   );

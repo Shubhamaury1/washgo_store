@@ -5,6 +5,7 @@ import {
   getVehicles,
   updateVehicle,
   toggleVehicleStatus,
+  deleteVehicle,
 } from "../controllers/vehicleController.js";
 import { upload } from "../middleware/uploadMiddleware.js";
 
@@ -18,5 +19,7 @@ router.get("/", getVehicles);
 router.put("/:id", upload.single("image"), updateVehicle);
 
 router.patch("/:id/status", toggleVehicleStatus);
+
+router.delete("/:id", deleteVehicle);
 
 export default router;

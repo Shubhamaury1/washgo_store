@@ -31,6 +31,15 @@ const Register = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
+    if (name === "mobile") {
+      const numericValue = value.replace(/\D/g, "").slice(0, 10);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: numericValue,
+      }));
+      return;
+    }
+
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
@@ -39,6 +48,16 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.mobile.length !== 10) {
+      toast.error("Mobile number must be exactly 10 digits");
+      return;
+    }
+
+    if (formData.password.length < 5) {
+      toast.error("Password must be at least 5 characters long");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
@@ -218,7 +237,10 @@ const Register = () => {
                   name="mobile"
                   value={formData.mobile}
                   onChange={handleChange}
-                  placeholder="Enter mobile number"
+                  maxLength={10}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  placeholder="Enter 10-digit mobile number"
                   className="mt-2 sm:mt-3 w-full rounded-xl sm:rounded-2xl border border-blue-100 bg-[#F8FAFD] px-4 sm:px-6 py-2.5 sm:py-4 text-sm sm:text-base outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
